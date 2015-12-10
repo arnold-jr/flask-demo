@@ -8,7 +8,7 @@ def main():
 
 @app.route('/index')
 def index():
-  return render_template('index.html')
+  return render_template('lines.html')
 
 if __name__ == '__main__':
   app.run(port=33507)
