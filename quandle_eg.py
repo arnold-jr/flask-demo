@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 import requests
+import string
+from datetime import date, timedelta
 import simplejson as json
 import pandas as pd
 import numpy as np
@@ -11,7 +13,11 @@ from bokeh.embed import components
 
 def parse_ticker(ticker):
   # the request is case insensitive
-  r = requests.get('https://www.quandl.com/api/v3/datasets/WIKI/'+ticker+'.json')
+  #r = requests.get('https://www.quandl.com/api/v3/datasets/WIKI/'+ticker+'.json')
+  r = requests.get('https://www.quandl.com/api/v3/datasets/WIKI/'
+      + ticker
+      + '.json?start_date='
+      + (date.today() - timedelta(days=30)).isoformat() )
   
   # handle invalid tickers
   if not 'dataset' in r.json():
@@ -20,7 +26,7 @@ def parse_ticker(ticker):
     dict1 = r.json()['dataset']
     col_names = dict1['column_names']
     data = dict1['data']
-    name = dict1['name'][:-45]
+    name = string.replace(dict1['name'],' Prices, Dividends, Splits and Trading Volume','')
     df = pd.DataFrame(data,columns=col_names)
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.loc[df['Date']>(df.loc[0,'Date']-np.timedelta64(31,'D'))]
